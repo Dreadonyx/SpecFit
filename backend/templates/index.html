@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>SpecFit</title>
+  <link rel="stylesheet" href="/static/style.css?v=2" />
+</head>
+
+<body>
+
+  <div class="dashboard">
+    <header class="header">
+      <h1>SpecFit</h1>
+      <span class="subtitle">System Health Monitor</span>
+    </header>
+
+    <section class="status">
+      <span id="verdict" class="verdict">Loading…</span>
+    </section>
+
+    <section class="metrics">
+
+      <div class="metric-block">
+        <label>CPU Usage</label>
+        <div class="bar">
+          <div class="fill" id="cpu-bar"></div>
+        </div>
+        <span id="cpu">--%</span>
+      </div>
+
+      <div class="metric-block">
+        <label>Memory Usage</label>
+        <div class="bar">
+          <div class="fill" id="memory-bar"></div>
+        </div>
+        <span id="memory">--%</span>
+      </div>
+
+    </section>
+
+    <section class="details">
+      <div><strong>Used:</strong> <span id="mem-used">--</span> GB</div>
+      <div><strong>Free:</strong> <span id="mem-free">--</span> GB</div>
+      <div><strong>Available:</strong> <span id="mem-avail">--</span> GB</div>
+    </section>
+
+    <section class="top-process">
+      <label>Top Memory Process</label>
+      <p id="top-process"><span id="proc-name">--</span> (<span id="proc-mem">--</span> GB)</p>
+    </section>
+
+    <section class="ai">
+      <label>AI Insight</label>
+      <p id="ai-insight">Analyzing system…</p>
+      <button id="refresh-btn">Refresh Status</button>
+    </section>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+
+</html>
