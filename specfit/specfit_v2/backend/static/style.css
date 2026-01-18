@@ -1,0 +1,130 @@
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  margin: 0;
+  background:
+    linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+    #0b0f14;
+  background-size: 40px 40px;
+  color: #e5e7eb;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dashboard {
+  width: 90%;
+  max-width: 1000px;
+  background: #121826;
+  border-radius: 16px;
+  padding: 32px;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0;
+  color: #22d3ee;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.verdict {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin: 24px 0;
+}
+
+.metric-block label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.bar {
+  background: #1f2937;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.6s ease;
+}
+
+#cpu-bar {
+  background: #22d3ee;
+}
+
+#memory-bar {
+  background: #a78bfa;
+}
+
+.details {
+  display: flex;
+  gap: 32px;
+  font-size: 0.9rem;
+  color: #d1d5db;
+  margin-bottom: 24px;
+}
+
+.ai label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.ai p {
+  margin-top: 8px;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+  white-space: pre-line !important;
+  line-height: 1.6;
+}
+
+.top-process {
+  margin-bottom: 20px;
+}
+
+.top-process label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.top-process p {
+  margin-top: 8px;
+  font-size: 1rem;
+  color: #e5e7eb;
+}
+
+button {
+  margin-top: 12px;
+  background: #1f2937;
+  color: #e5e7eb;
+  border: 1px solid #374151;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #374151;
+}

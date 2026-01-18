@@ -1,0 +1,90 @@
+body{
+    background: #0B0F14;
+    color: #E5E7EB;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+}
+
+.card{
+    background: #121826;
+    padding: 24px;
+    width: 350px;
+    border-radius:10px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+h1{
+    color: #22D3EE;
+    margin-bottom: 10px;
+}
+
+.verdict{
+    font-size: 1.3em;
+    font-weight: bold;
+    margin: 12px 0;
+}
+
+.metrics{
+    color: #9CA3AF;
+    margin: 10px 0;
+}
+
+.explanation{
+    font-size: 0.9em;
+    margin-top: 12px;
+    color: #D1D5DB;
+}
+
+.hint {
+  color: #9CA3AF;
+  font-size: 0.8em;
+  margin-bottom: 10px;
+}
+
+.metric {
+  margin: 14px 0;
+  text-align: left;
+}
+
+.metric p {
+  margin: 4px 0;
+  font-size: 0.9em;
+  color: #9CA3AF;
+}
+
+.bar {
+  background: #1F2937;
+  border-radius: 6px;
+  height: 12px;
+  overflow: hidden;
+  margin: 6px 0;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+#cpu-bar {
+  background: #22D3EE;
+}
+
+#memory-bar {
+  background: #A78BFA;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  max-width: 100%;
+  transition: width 0.5s ease;
+}
+
+.fill {
+  border-radius: 6px;
+}
