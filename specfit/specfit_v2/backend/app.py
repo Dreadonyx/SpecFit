@@ -17,55 +17,36 @@ GEMINI_ENDPOINT = (
 )
 
 NORMAL_MESSAGE = "System stable. No action needed."
+
 def get_top_memory_process():
-    # Map technical names to user-friendly names
-    NAME_MAPPING = {
-        'code': 'vscode',
-        'chrome': 'chrome',
-        'chromium': 'chrome',
-        'java': 'java',
-        'python': 'python',
-        'python3': 'python',
-        'node': 'nodejs',
-        'docker': 'docker',
-        'slack': 'slack',
-        'teams': 'teams',
-        'zoom': 'zoom'
-    }
+    """Get the process using the most memory, aggregating by name."""
+    from collections import defaultdict
     
-    processes = []
+    # Aggregate memory by process name
+    memory_by_name = defaultdict(float)
+    
     for p in psutil.process_iter(['name', 'exe', 'memory_info']):
         try:
             mem_gb = p.info['memory_info'].rss / (1024 ** 3)
             
-            # Try to get the executable name from the path
+            # Get exact executable name from path
             exe_path = p.info.get('exe')
             if exe_path:
-                # Extract just the executable name (e.g., "firefox-esr" from "/usr/lib/firefox-esr/firefox-esr")
-                import os
-                exe_name = os.path.basename(exe_path)
-                # Clean up common suffixes
-                if exe_name.endswith('-esr'):
-                    exe_name = exe_name.replace('-esr', '')
-                process_name = exe_name
+                process_name = os.path.basename(exe_path)
             else:
-                # Fallback to process name
                 process_name = p.info['name'] or "unknown"
             
-            # Apply friendly name mapping
-            process_name = NAME_MAPPING.get(process_name.lower(), process_name)
-            
-            processes.append({
-                "name": process_name,
-                "memory_gb": round(mem_gb, 2)
-            })
+            # Sum memory for all processes with the same name
+            memory_by_name[process_name] += mem_gb
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
 
-    if not processes:
+    if not memory_by_name:
         return {"name": "unknown", "memory_gb": 0}
 
-    return max(processes, key=lambda x: x["memory_gb"])
+    # Find the process name with highest total memory
+    top_name = max(memory_by_name, key=memory_by_name.get)
+    return {"name": top_name, "memory_gb": round(memory_by_name[top_name], 2)}
 
 def get_verdict(cpu, memory):
     if memory < 70:
@@ -75,10 +56,13 @@ def get_verdict(cpu, memory):
     return "OVERLOADED"
 
 def get_ai_insight(verdict, cpu, memory, top_proc, top_mem):
-    # Always call Gemini AI for insights, regardless of verdict
+    """Get AI insight from Gemini API only."""
     
-    prompt = f"""
-CRITICAL INSTRUCTION: You must output EXACTLY 3 numbered lines. Nothing else.
+    # For NORMAL status, return a simple stable message
+    if verdict == "NORMAL":
+        return "System stable. No action needed."
+    
+    prompt = f"""CRITICAL INSTRUCTION: You must output EXACTLY 3 numbered lines. Nothing else.
 
 System status: {verdict}
 Problem: {top_proc} using {top_mem}GB ({memory}% memory total)
@@ -87,16 +71,6 @@ Your output must be EXACTLY this format:
 1. [process name] is using high memory.
 2. Close [process name] if not in use or restart.
 3. Refresh status again to check.
-
-CORRECT example (use this exact structure):
-1. firefox is using high memory.
-2. Close firefox if not in use or restart.
-3. Refresh status again to check.
-
-WRONG formats (DO NOT use):
-- firefox: monitor usage
-- Close tabs
-- firefox is heavy
 
 Output the 3 numbered lines now using the process: {top_proc}
 """
@@ -112,28 +86,20 @@ Output the 3 numbered lines now using the process: {top_proc}
         
         data = response.json()
         candidates = data.get("candidates", [])
-        if not candidates:
-            return f"1. {top_proc} is using high memory.\n2. Close {top_proc} if not in use or restart.\n3. Refresh status again to check."
-
-        content = candidates[0].get("content", {})
-        parts = content.get("parts", [])
-
-        texts = []
-        for p in parts:
-            t = p.get("text")
-            if t:
-                texts.append(t.strip())
-
-        text = " ".join(texts)
-
-        if not text:
-            return f"1. {top_proc} is using high memory.\n2. Close {top_proc} if not in use or restart.\n3. Refresh status again to check."
-
-        return text
+        
+        if candidates:
+            content = candidates[0].get("content", {})
+            parts = content.get("parts", [])
+            texts = [p.get("text", "").strip() for p in parts if p.get("text")]
+            text = " ".join(texts)
+            
+            if text:
+                return text
+    except Exception:
+        pass
     
-    except Exception as e:
-        # If there's any error, just note it in the response
-        return f"1. Error getting AI insight: {str(e)[:30]}\n2. Check API connection.\n3. Refresh status again to check."
+    # Simple static fallback if Gemini fails (only for non-NORMAL states)
+    return f"Memory at {memory}%. Consider closing {top_proc}."
 
 
 @app.route("/")
