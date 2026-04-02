@@ -1,26 +1,39 @@
-# SpecFit
+# SpecFit 📊
 
-SpecFit is a lightweight system health monitor that evaluates CPU and memory usage
-and reports whether a system is operating normally for its current specifications.
+> System health monitor that tells you the truth about how your machine is doing.
+
+Not just CPU and RAM percentages — SpecFit classifies your system into one of three states and gives you a plain-language explanation of what's happening.
+
+## Health states
+
+| State | What it means |
+|---|---|
+| 🟢 NORMAL | All good |
+| 🟡 STRAINED | Under pressure, watch it |
+| 🔴 OVERLOADED | Something needs attention |
 
 ## Features
-- Real-time CPU & memory monitoring
-- Clear health verdict (NORMAL / STRAINED / OVERLOADED)
-- Optional AI-based explanation (local-first via Ollama, cloud fallback)
-- Non-blocking architecture (system metrics never wait on AI)
 
-## Tech Stack
-- Python (Flask)
-- psutil
-- Vanilla HTML/CSS/JS
-- Ollama (local AI)
-- Gemini (optional cloud AI)
+- Real-time CPU + memory monitoring via psutil
+- AI explains what's happening in plain language
+- Uses Ollama locally by default — falls back to Gemini if Ollama isn't running
+- Non-blocking: metrics load instantly, AI explanation loads separately
 
-## Why SpecFit?
-SpecFit focuses on **honest system health**, not vanity metrics.
-AI is used as an assistant, not a dependency.
+## Run
 
-## Run Locally
 ```bash
-cd backend
+git clone https://github.com/Dreadonyx/SpecFit
+cd SpecFit/specfit/specfit_v2/backend
+pip install flask psutil
 python app.py
+```
+
+Open `http://localhost:5000`.
+
+## Stack
+
+- Python / Flask
+- psutil
+- Ollama (local AI, primary)
+- Gemini API (cloud fallback)
+- Vanilla HTML/CSS/JS
