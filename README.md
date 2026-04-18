@@ -1,4 +1,4 @@
-# SpecFit 📊
+# SpecFit 
 
 > System health monitor that tells you the truth about how your machine is doing.
 
