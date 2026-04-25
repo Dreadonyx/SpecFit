@@ -16,15 +16,15 @@ Not just CPU and RAM percentages — SpecFit classifies your system into one of 
 
 - Real-time CPU + memory monitoring via psutil
 - AI explains what's happening in plain language
-- Uses Ollama locally by default — falls back to Gemini if Ollama isn't running
-- Non-blocking: metrics load instantly, AI explanation loads separately
+- Uses Gemini API for AI-powered explanations
+- Considers both CPU and memory for health verdicts
 
 ## Run
 
 ```bash
 git clone https://github.com/Dreadonyx/SpecFit
 cd SpecFit/specfit/specfit_v2/backend
-pip install flask psutil
+pip install flask flask-cors psutil requests python-dotenv
 python app.py
 ```
 
@@ -34,6 +34,5 @@ Open `http://localhost:5000`.
 
 - Python / Flask
 - psutil
-- Ollama (local AI, primary)
-- Gemini API (cloud fallback)
+- Gemini API (cloud AI)
 - Vanilla HTML/CSS/JS

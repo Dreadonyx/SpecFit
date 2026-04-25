@@ -49,11 +49,11 @@ def get_top_memory_process():
     return {"name": top_name, "memory_gb": round(memory_by_name[top_name], 2)}
 
 def get_verdict(cpu, memory):
-    if memory < 70:
-        return "NORMAL"
-    if memory < 85:
+    if cpu > 90 or memory > 85:
+        return "OVERLOADED"
+    if cpu > 70 or memory > 70:
         return "STRAINED"
-    return "OVERLOADED"
+    return "NORMAL"
 
 def get_ai_insight(verdict, cpu, memory, top_proc, top_mem):
     """Get AI insight from Gemini API only."""
