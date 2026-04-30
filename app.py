@@ -10,11 +10,9 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_ENDPOINT = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    "gemini-1.5-flash:generateContent"
-)
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
+GROQ_MODEL = "llama-3.1-8b-instant"
 
 NORMAL_MESSAGE = "System stable. No action needed."
 
@@ -56,7 +54,7 @@ def get_verdict(cpu, memory):
     return "NORMAL"
 
 def get_ai_insight(verdict, cpu, memory, top_proc, top_mem):
-    """Get AI insight from Gemini API only."""
+    """Get AI insight from Groq API."""
     
     # For NORMAL status, return a simple stable message
     if verdict == "NORMAL":
@@ -77,28 +75,34 @@ Output the 3 numbered lines now using the process: {top_proc}
 
     try:
         response = requests.post(
-            f"{GEMINI_ENDPOINT}?key={GEMINI_API_KEY}",
+            GROQ_ENDPOINT,
+            headers={
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json"
+            },
             json={
-                "contents": [
-                    {"parts": [{"text": prompt}]}]
-            }
+                "model": GROQ_MODEL,
+                "messages": [
+                    {"role": "system", "content": "You are a concise system health advisor. Follow instructions exactly."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.3,
+                "max_tokens": 150
+            },
+            timeout=10
         )
         
         data = response.json()
-        candidates = data.get("candidates", [])
+        choices = data.get("choices", [])
         
-        if candidates:
-            content = candidates[0].get("content", {})
-            parts = content.get("parts", [])
-            texts = [p.get("text", "").strip() for p in parts if p.get("text")]
-            text = " ".join(texts)
-            
+        if choices:
+            text = choices[0].get("message", {}).get("content", "").strip()
             if text:
                 return text
     except Exception:
         pass
     
-    # Simple static fallback if Gemini fails (only for non-NORMAL states)
+    # Simple static fallback if Groq fails (only for non-NORMAL states)
     return f"Memory at {memory}%. Consider closing {top_proc}."
 
 
