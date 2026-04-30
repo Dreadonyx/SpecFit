@@ -1,63 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
-  <title>SpecFit</title>
-  <link rel="stylesheet" href="/static/style.css?v=2" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpecFit — System Health Monitor</title>
+  <meta name="description" content="AI-powered real-time system health monitoring dashboard" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🖥️</text></svg>" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
-
 <body>
 
-  <div class="dashboard">
-    <header class="header">
-      <h1>SpecFit</h1>
-      <span class="subtitle">System Health Monitor</span>
-    </header>
+  <!-- Header -->
+  <header class="header" id="main-header">
+    <div class="header-left">
+      <h1>Spec<span class="accent">Fit</span></h1>
+      <span class="subtitle" id="system-info">Loading…</span>
+    </div>
+    <div class="header-right">
+      <span class="verdict-badge" id="verdict">—</span>
+      <span class="uptime" id="uptime">—</span>
+    </div>
+  </header>
 
-    <section class="status">
-      <span id="verdict" class="verdict">Loading…</span>
-    </section>
+  <!-- Main Grid -->
+  <main class="dashboard" id="dashboard">
 
-    <section class="metrics">
-
-      <div class="metric-block">
-        <label>CPU Usage</label>
-        <div class="bar">
-          <div class="fill" id="cpu-bar"></div>
-        </div>
-        <span id="cpu">--%</span>
+    <!-- Row 1: Gauges -->
+    <section class="card gauge-card" id="cpu-gauge-card">
+      <div class="card-header"><span class="card-icon">⚡</span> CPU</div>
+      <div class="gauge-container">
+        <svg class="gauge-ring" viewBox="0 0 120 120">
+          <circle class="gauge-bg" cx="60" cy="60" r="52" />
+          <circle class="gauge-fill" id="cpu-ring" cx="60" cy="60" r="52" />
+        </svg>
+        <div class="gauge-text" id="cpu-text">0%</div>
       </div>
-
-      <div class="metric-block">
-        <label>Memory Usage</label>
-        <div class="bar">
-          <div class="fill" id="memory-bar"></div>
-        </div>
-        <span id="memory">--%</span>
+      <div class="gauge-meta">
+        <span id="cpu-cores">— cores</span>
+        <span id="cpu-freq">— MHz</span>
       </div>
-
     </section>
 
-    <section class="details">
-      <div><strong>Used:</strong> <span id="mem-used">--</span> GB</div>
-      <div><strong>Free:</strong> <span id="mem-free">--</span> GB</div>
-      <div><strong>Available:</strong> <span id="mem-avail">--</span> GB</div>
+    <section class="card gauge-card" id="memory-gauge-card">
+      <div class="card-header"><span class="card-icon">🧠</span> Memory</div>
+      <div class="gauge-container">
+        <svg class="gauge-ring" viewBox="0 0 120 120">
+          <circle class="gauge-bg" cx="60" cy="60" r="52" />
+          <circle class="gauge-fill memory-ring" id="mem-ring" cx="60" cy="60" r="52" />
+        </svg>
+        <div class="gauge-text" id="mem-text">0%</div>
+      </div>
+      <div class="gauge-meta">
+        <span id="mem-used-total">— / — GB</span>
+        <span id="mem-available">— avail</span>
+      </div>
     </section>
 
-    <section class="top-process">
-      <label>Top Memory Process</label>
-      <p id="top-process"><span id="proc-name">--</span> (<span id="proc-mem">--</span> GB)</p>
+    <section class="card gauge-card" id="swap-gauge-card">
+      <div class="card-header"><span class="card-icon">💾</span> Swap</div>
+      <div class="gauge-container">
+        <svg class="gauge-ring" viewBox="0 0 120 120">
+          <circle class="gauge-bg" cx="60" cy="60" r="52" />
+          <circle class="gauge-fill swap-ring" id="swap-ring" cx="60" cy="60" r="52" />
+        </svg>
+        <div class="gauge-text" id="swap-text">0%</div>
+      </div>
+      <div class="gauge-meta">
+        <span id="swap-used-total">— / — GB</span>
+      </div>
     </section>
 
-    <section class="ai">
-      <label>AI Insight</label>
-      <p id="ai-insight">Analyzing system…</p>
-      <button id="refresh-btn">Refresh Status</button>
+    <section class="card ai-card" id="ai-card">
+      <div class="card-header"><span class="card-icon">🤖</span> AI Insight</div>
+      <p class="ai-text" id="ai-insight">Analyzing system…</p>
     </section>
-  </div>
+
+    <!-- Row 2: Charts -->
+    <section class="card chart-card wide" id="cpu-chart-card">
+      <div class="card-header"><span class="card-icon">📈</span> CPU History</div>
+      <canvas id="cpu-chart"></canvas>
+    </section>
+
+    <section class="card chart-card wide" id="mem-chart-card">
+      <div class="card-header"><span class="card-icon">📊</span> Memory / Swap History</div>
+      <canvas id="mem-chart"></canvas>
+    </section>
+
+    <!-- Row 3: Network + Disk I/O -->
+    <section class="card chart-card wide" id="net-chart-card">
+      <div class="card-header">
+        <span><span class="card-icon">🌐</span> Network I/O</span>
+        <span class="card-stat" id="net-stat">↑ 0 KB/s &nbsp; ↓ 0 KB/s &nbsp; 🔗 0</span>
+      </div>
+      <canvas id="net-chart"></canvas>
+    </section>
+
+    <section class="card chart-card wide" id="disk-io-chart-card">
+      <div class="card-header">
+        <span><span class="card-icon">💿</span> Disk I/O</span>
+        <span class="card-stat" id="disk-io-stat">R: 0 MB/s &nbsp; W: 0 MB/s</span>
+      </div>
+      <canvas id="disk-io-chart"></canvas>
+    </section>
+
+    <!-- Row 4: Per-core + Disk partitions -->
+    <section class="card chart-card wide" id="core-chart-card">
+      <div class="card-header"><span class="card-icon">🔲</span> CPU Per-Core</div>
+      <canvas id="core-chart"></canvas>
+    </section>
+
+    <section class="card" id="disk-card">
+      <div class="card-header"><span class="card-icon">📁</span> Disk Partitions</div>
+      <div class="disk-list" id="disk-list">Loading…</div>
+    </section>
+
+    <!-- Row 5: Processes + Temps -->
+    <section class="card full-width" id="proc-card">
+      <div class="card-header"><span class="card-icon">⚙️</span> Top Processes (by Memory)</div>
+      <div class="table-wrap">
+        <table id="proc-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Memory</th>
+              <th>Mem %</th>
+              <th>CPU %</th>
+              <th>Instances</th>
+            </tr>
+          </thead>
+          <tbody id="proc-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card" id="temp-card" style="display:none;">
+      <div class="card-header"><span class="card-icon">🌡️</span> Temperatures</div>
+      <div class="temp-list" id="temp-list"></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span>SpecFit · Auto-refreshing every 3s · Powered by <a href="https://console.groq.com" target="_blank">Groq AI</a></span>
+  </footer>
 
   <script src="/static/app.js"></script>
 </body>
-
 </html>
