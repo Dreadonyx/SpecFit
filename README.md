@@ -4,7 +4,8 @@
 
 Not just CPU and RAM percentages — SpecFit classifies your system into one of three health states and uses **Groq AI** to explain what's happening in plain language.
 
-![SpecFit Dashboard](screenshot.png)
+![SpecFit Dashboard - Overview](screenshot1.png)
+![SpecFit Dashboard - Processes & Temps](screenshot2.png)
 
 ---
 
